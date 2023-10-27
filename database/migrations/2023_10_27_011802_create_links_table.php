@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('description');
             $table->string('url');
             $table->tinyInteger('status')->default(1);
+            $table->dateTime('expires_at')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

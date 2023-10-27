@@ -23,7 +23,10 @@ class LinkResource extends Resource
     {
         return $form
             ->schema([
-                //
+                Forms\Components\TextInput::make('description')->required(),
+                Forms\Components\TextInput::make('url')->required(),
+                Forms\Components\Toggle::make('status')->required(),
+                Forms\Components\DatePicker::make('expires_at')
             ]);
     }
 
@@ -31,17 +34,22 @@ class LinkResource extends Resource
     {
         return $table
             ->columns([
-                //
+                Tables\Columns\TextColumn::make('description')->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('url')->searchable()->sortable(),
+                Tables\Columns\ToggleColumn::make('status')->sortable(),
             ])
             ->filters([
-                //
+                Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\ForceDeleteBulkAction::make(),
+                    Tables\Actions\RestoreBulkAction::make(),
                 ]),
             ]);
     }
@@ -61,4 +69,12 @@ class LinkResource extends Resource
             'edit' => Pages\EditLink::route('/{record}/edit'),
         ];
     }    
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]);
+    }
 }
